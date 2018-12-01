@@ -1,5 +1,5 @@
 import numpy as np
-from data_loader import data_loader
+from data_loader_kdef import data_loader
 import tensorflow as tf
 from keras import applications
 from keras.preprocessing.image import ImageDataGenerator
@@ -23,8 +23,8 @@ class WeightsSaver(Callback):
             self.model.save_weights(name)
         self.epoch += 1
 
-input_image_size = (227, 227)
-label_indices = {"neutral":0, "anger":1, "contempt":2, "disgust":3, "fear":4, "happy":5, "sadness":6, "surprise":7}
+input_image_size = (127, 94)
+label_indices = {"neutral":0, "angry":1, "contempt":2, "disgusted":3, "fearful":4, "happy":5, "sad":6, "surprised":7}
 labels_ordered = list(label_indices)
 num_classes = len(label_indices)
 
@@ -44,14 +44,15 @@ data = data_loader(label_indices = label_indices,
 batch_size = 16
 epochs = 200
 model = applications.VGG19(weights = "imagenet", include_top=False, input_shape = (input_image_size[0], input_image_size[1], 3))
-for layer in model.layers[:5]:
-    layer.trainable = False
+# for layer in model.layers[:5]:
+#     layer.trainable = False
 x = model.output
 x = Flatten()(x)
-x = Dense(256, activation="relu")(x)
-x = Dense(256, activation="relu")(x)
-x = Dropout(0.5)(x)
-x = Dense(128, activation="relu")(x)
+# x = Dense(50, activation="relu")(x)
+# x = Dense(50, activation="relu")(x)
+# # x = Dropout(0.5)(x)
+# x = Dense(20, activation="relu")(x)
+
 # x = Dense(100, activation="relu")(x)
 # x = Dense(200, activation="relu")(x)
 
@@ -64,13 +65,13 @@ x = Dense(128, activation="relu")(x)
 
 predictions = Dense(num_classes, activation="softmax")(x)
 model_final = Model(input = model.input, output = predictions)
-model_final.compile(loss = "categorical_crossentropy", optimizer = optimizers.Adamax(), metrics=["accuracy"])
+model_final.compile(loss = "categorical_crossentropy", optimizer = optimizers.Adam(lr=0.00001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), metrics=["accuracy"])
 
 train_datagen = ImageDataGenerator(
 rescale = 1./255,
 horizontal_flip = True,
 fill_mode = "nearest",
-zoom_range = 0.0,
+zoom_range = 0.3,
 width_shift_range = 0.3,
 height_shift_range=0.3,
 rotation_range=30)
@@ -102,13 +103,13 @@ rotation_range=30)
 # checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 # callbacks_list = [checkpoint]
 
-model_final.fit_generator(
-train_datagen.flow(data.train.X, data.train.y, batch_size=32),steps_per_epoch=len(data.train.X) / 32, epochs=epochs,callbacks=[WeightsSaver(model, 20)])
+# model_final.fit_generator(
+# train_datagen.flow(data.train.X, data.train.y, batch_size=32),steps_per_epoch=len(data.train.X) / 32, epochs=epochs,callbacks=[WeightsSaver(model, 20)])
 
 # model_final.fit(data.train.X, data.train.y,epochs=epochs)
-# model_final.fit(data.train.X, data.train.y,
-#                         validation_data=(data.train.X, data.train.y),
-#                         nb_epoch=epochs, batch_size=batch_size,callbacks=[WeightsSaver(model, 20)])
+model_final.fit(data.train.X, data.train.y,
+                        # validation_data=(data.train.X, data.train.y),
+                        nb_epoch=epochs, batch_size=batch_size,callbacks=[WeightsSaver(model, 20)])
     # Evaluate
 score = top_layer_model.evaluate(data.test.X,
                                      data.test.y, batch_size=batch_size)
