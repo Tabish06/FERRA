@@ -5,7 +5,9 @@ import argparse
 import os
 
 class FacialExpressionModel(object):
-    EMOTIONS_LIST = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+    # label_indices = {"surprise":1,"fear":2,"disgust":3,"happiness":4,"sadness":5,"anger":6,"neutral":0}
+
+    EMOTIONS_LIST = ["neutral", "surprise","fear" ,"disgust", "happiness", "sadness", "anger"]
 
     def __init__(self, model_json_file, model_weights_file):
         with open(model_json_file, "r") as json_file:
@@ -43,8 +45,9 @@ def start_app(cnn):
         faces, fr, gray_fr = getdata()
         for (x, y, w, h) in faces:
             fc = gray_fr[y:y + h, x:x + w]
-            roi = cv2.resize(fc, (48, 48))
-            pred = cnn.predict_emotion(roi[np.newaxis, :, :, np.newaxis])
+            roi = cv2.resize(fc, (94, 127))
+            backtorgb = cv2.cvtColor(roi,cv2.COLOR_GRAY2RGB)
+            pred = cnn.predict_emotion(backtorgb[np.newaxis, :, :,:])
 
             cv2.putText(fr, pred, (x, y), font, 1, (255, 255, 0), 1)
             cv2.rectangle(fr, (x, y), (x + w, y + h), (255, 0, 0), 1)
