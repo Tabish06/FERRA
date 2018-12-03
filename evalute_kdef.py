@@ -11,6 +11,7 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard,
 
 from keras.callbacks import Callback
 
+
 class WeightsSaver(Callback):
     def __init__(self, model, N):
         self.model = model
@@ -44,7 +45,10 @@ data = data_loader(label_indices = label_indices,
 batch_size = 16
 epochs = 200
 model = applications.VGG19(weights = "imagenet", include_top=False, input_shape = (input_image_size[0], input_image_size[1], 3))
+# model = applications.ResNet50(weights = "imagenet", include_top=False, input_shape = (input_image_size[0], input_image_size[1], 3))
+
 # for layer in model.layers[:5]:
+
 #     layer.trainable = False
 x = model.output
 x = Flatten()(x)
@@ -64,17 +68,27 @@ x = Flatten()(x)
 
 
 predictions = Dense(num_classes, activation="softmax")(x)
+filepath='checkpoint/Model.{epoch:02d}-{val_acc:.4f}.hdf5'
+checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=False, mode='auto')
+
 model_final = Model(input = model.input, output = predictions)
 model_final.compile(loss = "categorical_crossentropy", optimizer = optimizers.Adam(lr=0.00001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), metrics=["accuracy"])
+# model_final.compile(loss = "categorical_crossentropy", optimizer = optimizers.Adam(lr=0.000000001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), metrics=["accuracy"])
+
 
 train_datagen = ImageDataGenerator(
-rescale = 1./255,
-horizontal_flip = True,
-fill_mode = "nearest",
-zoom_range = 0.3,
-width_shift_range = 0.3,
-height_shift_range=0.3,
-rotation_range=30)
+    featurewise_center=False,  # set input mean to 0 over the dataset
+    samplewise_center=False,  # set each sample mean to 0
+    featurewise_std_normalization=False,  # divide inputs by std of the dataset
+    samplewise_std_normalization=False,  # divide each input by its std
+    zca_whitening=False,  # apply ZCA whitening
+    rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
+    width_shift_range=0.3,  # randomly shift images horizontally (fraction of total width)
+    height_shift_range=0.3,  # randomly shift images vertically (fraction of total height)
+    horizontal_flip=True,  # randomly flip images
+    vertical_flip=False,   # randomly flip images
+    rescale = 1./255,
+)
 
 test_datagen = ImageDataGenerator(
 rescale = 1./255,
@@ -96,24 +110,29 @@ rotation_range=30)
 # target_size = (input_image_size[0], input_image_size[1]),
 # class_mode = "categorical")
 
-# checkpoint = ModelCheckpoint("vgg16_1.h5", monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
-# early = EarlyStopping(monitor='val_acc', min_delta=0, patience=10, verbose=1, mode='auto')
 
-# filepath="weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-# checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-# callbacks_list = [checkpoint]
+# model_final.load_weights('checkpoint/weights00002180.h5')
 
-# model_final.fit_generator(
-# train_datagen.flow(data.train.X, data.train.y, batch_size=32),steps_per_epoch=len(data.train.X) / 32, epochs=epochs,callbacks=[WeightsSaver(model, 20)])
+model_final.fit_generator(
+train_datagen.flow(data.train.X, data.train.y, batch_size=batch_size),validation_data = test_datagen.flow(data.test.X,data.test.y,batch_size=batch_size),validation_steps=len(data.test.X) / batch_size,steps_per_epoch=len(data.train.X) / batch_size, epochs=epochs,callbacks=[checkpointer])
 
+# model_final
 # model_final.fit(data.train.X, data.train.y,epochs=epochs)
-model_final.fit(data.train.X, data.train.y,
-                        # validation_data=(data.train.X, data.train.y),
-                        nb_epoch=epochs, batch_size=batch_size,callbacks=[WeightsSaver(model, 20)])
+# model_final.fit(data.train.X, data.train.y,
+#                         # validation_data=(data.train.X, data.train.y),
+#                         nb_epoch=epochs, batch_size=batch_size,callbacks=[WeightsSaver(model_final, 20)])
     # Evaluate
-score = top_layer_model.evaluate(data.test.X,
-                                     data.test.y, batch_size=batch_size)
+# model_final.save_weights('checkpoint/final.hdf5')
 
+score = model_final.evaluate(data.test.X,
+                                     data.test.y, batch_size=batch_size)
+# model_final.predict()
+print(score)
+model_json = model_final.to_json()
+with open("model.json","w") as json_file:
+     json_file.write(model_json)
+
+model.save('weights.h5')
 # samples_per_epoch = nb_train_samples,
 # epochs = epochs,
 # validation_data = validation_generator,
