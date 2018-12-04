@@ -40,6 +40,7 @@ num_classes = len(label_indices)
 channel_means = np.array([147.12697, 160.21092, 167.70029])
 train_test_split = 0.7
 
+
 data = data_loader(label_indices = label_indices, 
            channel_means = channel_means, 
            train_test_split = train_test_split,
@@ -82,6 +83,7 @@ checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_bes
 model_final = Model(input = model.input, output = predictions)
 model_final.compile(loss = "categorical_crossentropy", optimizer = optimizers.Adam(lr=0.00001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), metrics=["accuracy"])
 # model_final.compile(loss = "categorical_crossentropy", optimizer = optimizers.Adam(lr=0.000000001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False), metrics=["accuracy"])
+model_final.load_weights('weights.h5')
 
 
 train_datagen = ImageDataGenerator(
