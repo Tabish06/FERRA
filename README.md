@@ -6,27 +6,21 @@ This project aims at determing facial emotions from cell phones at the retail st
 
 # Setup
 
-## Install Python 3.6. 
-## Clone this Repository. 
+### Install Python 3.6 
+### Clone this Repository 
 ```
-git clone 
+git clone https://github.com/Tabish06/FERRA.git
 ```
-## (Optional and Recommended) Set up a Python Virtual Environment 
-Steps for Unbuntu/Mac:  
-```
-virtualenv --system-site-packages -p python3 ./venv  
-source ./venv/bin/activate
-
-```
-## Install Tensorflow  
+### (Optional and Recommended) Set up a Python Virtual Environment 
+### Install Tensorflow  
 Note that this will require Python.
 To install Tensorflow using pip, run the following:  
 `pip install --upgrade tensorflow` 
 
 To verify the install:  
-`python -c "import tensorflow as tf;` 
+`python -c "import tensorflow as tf;"` 
 
-## Install Keras
+### Install Keras
 
 
 # Train
