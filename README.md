@@ -4,15 +4,33 @@
 
 This project aims at determing facial emotions from cell phones at the retail store. The project deals with using multiple available datasets such as KDEF, RAF and FER2013 for emotion recognition. There are slight changes needed with RAF to load the data. The project uses Convolutional Neural Network with Dense Layer to determine the emotion of the person. It uses VGG 19 as the base model.
 
-# Todo
+# Setup
 
-1) Install python 3.6
-2) Install tensorflow
-3) Install keras
+## Install Python 3.6. 
+## Clone this Repository. 
+```
+git clone 
+```
+## (Optional and Recommended) Set up a Python Virtual Environment 
+Steps for Unbuntu/Mac:  
+```
+virtualenv --system-site-packages -p python3 ./venv  
+source ./venv/bin/activate
+
+```
+## Install Tensorflow  
+Note that this will require Python.
+To install Tensorflow using pip, run the following:  
+`pip install --upgrade tensorflow` 
+
+To verify the install:  
+`python -c "import tensorflow as tf;` 
+
+## Install Keras
 
 
 # Train
 
-python evalute.py
+To train the mode, run `python evalute.py`
 
 
