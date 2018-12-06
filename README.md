@@ -15,13 +15,20 @@ git clone https://github.com/Tabish06/FERRA.git
 ### Install Tensorflow  
 Note that this will require Python.
 To install Tensorflow using pip, run the following:  
-`pip install --upgrade tensorflow` 
+```
+pip install --upgrade tensorflow
+``` 
 
 To verify the install:  
-`python -c "import tensorflow as tf;"` 
+```
+python -c "import tensorflow as tf;"
+``` 
 
 ### Install Keras
-
+Installing using PyPI:
+```
+pip install keras
+```
 
 # Train
 
