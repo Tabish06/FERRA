@@ -10,6 +10,7 @@ This project aims at determing facial emotions from cell phones at the retail st
 ### Clone this Repository 
 ```
 git clone https://github.com/Tabish06/FERRA.git
+Copy shape predictor file to cloned folder: https://drive.google.com/file/d/1blALLnjbpvyHHi8xOZmHPUgna0E5Jurb/view?usp=sharing
 ```
 ### (Optional and Recommended) Set up a Python Virtual Environment 
 ### Install Tensorflow  
